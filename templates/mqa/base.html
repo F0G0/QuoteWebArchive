@@ -43,6 +43,15 @@
     </div>
 </nav>
 <div class="container-fluid">
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     {% block content %}
 
     {% endblock %}

@@ -1,5 +1,35 @@
 {% extends 'mqa/base.html' %}
 {% block title %}Home page{% endblock %}
 {% block content %}
-    <h1>Home page!</h1>
+    {% if q %}
+        <div class="container mt-4" style="max-width: 800px;">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <figure class="mb-0">
+                        <blockquote class="blockquote">
+                            <p class="mb-0">{{ q.quote_content }}</p>
+                        </blockquote>
+                        <figcaption class="blockquote-footer mt-2">
+                            Источник: <strong>{{ q.source_name }}</strong>
+                            {% if q.source_type %}
+                                <span class="text-muted">({{ q.get_source_type_display|default:q.source_type }})</span>
+                            {% endif %}
+                            <br/>
+                            Автор: <strong>{{ q.author.username }}</strong>
+                        </figcaption>
+                    </figure>
+                </div>
+                <div class="card-footer text-muted d-flex justify-content-between small">
+                    {% if q.views is not None %}<span>Просмотров: {{ q.views }}</span>{% endif %}
+                    {% if q.weight is not None %}<span>Вес: {{ q.weight }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="container mt-4" style="max-width: 800px;">
+            <div class="alert alert-info" role="alert">
+                Цитата пока не выбрана. Добавьте цитату или настройте показ.
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

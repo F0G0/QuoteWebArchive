@@ -1,0 +1,9 @@
+{% extends 'mqa/base.html' %}
+{% load crispy_forms_filters %}
+{% block title %}Создать новую цитату{% endblock %}
+{% block content %}
+    <form method="post">
+        {% csrf_token %}{{ form|crispy }}
+        <button type="submit" class="btn btn-success">Создать</button>
+    </form>
+{% endblock %}
