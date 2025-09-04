@@ -19,9 +19,27 @@
                         </figcaption>
                     </figure>
                 </div>
-                <div class="card-footer text-muted d-flex justify-content-between small">
-                    {% if q.views is not None %}<span>Просмотров: {{ q.views }}</span>{% endif %}
-                    {% if q.weight is not None %}<span>Вес: {{ q.weight }}</span>{% endif %}
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div class="small text-muted">
+                        {% if q.views is not None %}<span class="me-3">Просмотров: {{ q.views }}</span>{% endif %}
+                        {% if q.weight is not None %}<span>Вес: {{ q.weight }}</span>{% endif %}
+                    </div>
+                    <div>
+                        <form method="post" action="{% url 'home' %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="quote_id" value="{{ q.id }}"/>
+                            <button type="submit" name="reaction" value="like" class="btn btn-sm {% if user_reaction and user_reaction.value == 1 %}btn-success{% else %}btn-outline-success{% endif %}">
+                                👍 {{ q.likes_count }}
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'home' %}" class="d-inline ms-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="quote_id" value="{{ q.id }}"/>
+                            <button type="submit" name="reaction" value="dislike" class="btn btn-sm {% if user_reaction and user_reaction.value == -1 %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                👎 {{ q.dislikes_count }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from mqa.forms import RegisterForm, QuoteForm
-from mqa.models import Quote
+from mqa.models import Quote, Reaction
 from django.db.models import Sum, F
 import random
 from django.contrib import messages
@@ -9,6 +9,29 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.contrib.auth import authenticate, login, logout
 @login_required(login_url='/login')
 def home(request):
+    if request.method == 'POST':
+        action = request.POST.get('reaction')
+        quote_id = request.POST.get('quote_id')
+        if action in {'like', 'dislike'} and quote_id:
+            try:
+                quote = Quote.objects.get(pk=quote_id)
+            except Quote.DoesNotExist:
+                messages.error(request, 'Цитата не найдена.')
+            else:
+                desired_value = Reaction.Value.LIKE if action == 'like' else Reaction.Value.DISLIKE
+                existing = Reaction.objects.filter(user=request.user, quote=quote).first()
+                if existing and existing.value == desired_value:
+                    existing.delete()
+                    messages.success(request, 'Реакция удалена.')
+                else:
+                    Reaction.objects.update_or_create(
+                        user=request.user,
+                        quote=quote,
+                        defaults={'value': desired_value},
+                    )
+                    messages.success(request, 'Реакция сохранена.')
+        return redirect('home')
+
     weighted_quote = None
     quotes_qs = Quote.objects.all()
     total_weight = quotes_qs.aggregate(total=Sum('weight')).get('total') or 0
@@ -26,7 +49,19 @@ def home(request):
             weighted_quote.views = (weighted_quote.views or 0) + 1
         except Exception:
             pass
-    return render(request, 'mqa/home.html', {'q': weighted_quote})
+        user_reaction = Reaction.objects.filter(user=request.user, quote=weighted_quote).first()
+    else:
+        user_reaction = None
+    return render(request, 'mqa/home.html', {'q': weighted_quote, 'user_reaction': user_reaction})
+
+
+@login_required(login_url='/login')
+def quotes_list(request):
+    quotes = (
+        Quote.objects.select_related('author')
+        .order_by('-weight', '-views', '-update_time', '-id')
+    )
+    return render(request, 'mqa/quotes_list.html', {"quotes": quotes})
 
 def sign_up(request):
     if request.method == 'POST':
