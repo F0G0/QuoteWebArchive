@@ -1,0 +1,29 @@
+{% extends 'mqa/base.html' %}
+{% block title %}Top 10 quotes{% endblock %}
+{% block content %}
+    <div class="container mt-4" style="max-width: 900px;">
+        <h3 class="mb-3">Топ 10 цитат по лайкам</h3>
+        {% if quotes %}
+            <div class="list-group">
+                {% for q in quotes %}
+                    <div class="list-group-item list-group-item-action mb-3 shadow-sm">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ q.source_name }}{% if q.source_type %} <small class="text-muted">({{ q.get_source_type_display|default:q.source_type }})</small>{% endif %}</h5>
+                            <small class="text-muted">Автор: {{ q.author.username }}</small>
+                        </div>
+                        <p class="mb-1">{{ q.quote_content }}</p>
+                        <div class="d-flex justify-content-between align-items-center small text-muted mt-2">
+                            <span>👍 {{ q.likes_count }} · 👎 {{ q.dislikes_count }}</span>
+                            <span>Просмотров: {{ q.views }} · Вес: {{ q.weight }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">Пока нет цитат.</div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+
+

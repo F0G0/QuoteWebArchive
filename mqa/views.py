@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from mqa.forms import RegisterForm, QuoteForm
+from mqa.forms import RegisterForm, QuoteForm, QuoteWeightForm, LoginForm
 from mqa.models import Quote, Reaction
 from django.db.models import Sum, F
 import random
@@ -63,6 +63,30 @@ def quotes_list(request):
     )
     return render(request, 'mqa/quotes_list.html', {"quotes": quotes})
 
+
+@login_required(login_url='/login')
+def my_quotes(request):
+    quotes = (
+        Quote.objects.select_related('author')
+        .filter(author=request.user)
+        .order_by('-update_time', '-id')
+    )
+    return render(request, 'mqa/quotes_list.html', {"quotes": quotes})
+
+
+@login_required(login_url='/login')
+def delete_quote(request, quote_id):
+    if request.method != 'POST':
+        return redirect('my_quotes')
+    try:
+        quote = Quote.objects.get(pk=quote_id, author=request.user)
+    except Quote.DoesNotExist:
+        messages.error(request, 'Цитата не найдена или у вас нет прав.')
+    else:
+        quote.delete()
+        messages.success(request, 'Цитата удалена.')
+    return redirect('my_quotes')
+
 def sign_up(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -102,3 +126,42 @@ def create_quote(request):
     else:
         form = QuoteForm()
     return render(request, 'mqa/create_post.html',{"form": form})
+
+
+@login_required(login_url='/login')
+def edit_quote_weight(request, quote_id):
+    try:
+        quote = Quote.objects.get(pk=quote_id, author=request.user)
+    except Quote.DoesNotExist:
+        messages.error(request, 'Цитата не найдена или у вас нет прав.')
+        return redirect('my_quotes')
+
+    if request.method == 'POST':
+        form = QuoteWeightForm(request.POST, instance=quote)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Вес цитаты обновлён.')
+            return redirect('my_quotes')
+    else:
+        form = QuoteWeightForm(instance=quote)
+
+    return render(request, 'mqa/edit_weight.html', {"form": form, "quote": quote})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = LoginForm()
+    return render(request, 'registration/login.html', {'form': form})
+
+
+def top_quotes(request):
+    quotes = list(Quote.objects.select_related('author').all())
+    quotes.sort(key=lambda q: q.likes_count, reverse=True)
+    quotes = quotes[:10]
+    return render(request, 'mqa/top_quotes.html', {"quotes": quotes})

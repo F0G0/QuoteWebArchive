@@ -1,0 +1,24 @@
+{% extends 'mqa/base.html' %}
+{% load crispy_forms_filters %}
+{% block title %}Изменить вес цитаты{% endblock %}
+{% block content %}
+    <div class="container mt-4" style="max-width: 600px;">
+        <h4 class="mb-3">Изменить вес цитаты</h4>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <p class="mb-3"><strong>Источник:</strong> {{ quote.source_name }}{% if quote.source_type %} <small class="text-muted">({{ quote.get_source_type_display|default:quote.source_type }})</small>{% endif %}</p>
+                <p class="mb-3"><strong>Цитата:</strong> {{ quote.quote_content }}</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-success">Сохранить</button>
+                        <a href="{% url 'my_quotes' %}" class="btn btn-secondary ms-2">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+

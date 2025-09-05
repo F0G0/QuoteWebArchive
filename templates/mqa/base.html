@@ -14,30 +14,38 @@
         <div>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/home">Home</a>
+                    <a class="nav-link" href="/home">Случайная цитата</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/create-post">Post</a>
+                    <a class="nav-link" href="/create-post">Создать цитату</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/quotes">Quotes</a>
+                    <a class="nav-link" href="/quotes">Все цитаты</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/top">Топ 10</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/my-quotes">Мои цитаты</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
         <div>
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                    <span class="navbar-text me-3">Logged in as {{ user.username }}</span>
+                    <span class="navbar-text me-3">Имя пользователя: {{ user.username }}</span>
                     <li class="nav-item">
                         <form action="{% url 'logout' %}" method="post">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Logout</button>
+                            <button type="submit" class="btn btn-danger">Выйти</button>
                         </form>
                     </li>
                 {% else %}
                     <li class="nav-item">
                         <form action="{% url 'login' %}">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                            <button type="submit" class="btn btn-primary">Войти</button>
                         </form>
                     </li>
                 {% endif %}

@@ -5,11 +5,11 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 class Quote(models.Model):
     class SourceType(models.TextChoices):
-        MOVIE = 'movie', 'Movie'
-        BOOK = 'book', 'Book'
-        SERIES = 'series', 'Series'
-        GAME = 'game', 'Game'
-        OTHER = 'other', 'Other'
+        MOVIE = 'movie', 'Фильм'
+        BOOK = 'book', 'Книга'
+        SERIES = 'series', 'Сериал'
+        GAME = 'game', 'Игра'
+        OTHER = 'other', 'Другое'
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     source_name = models.CharField(max_length=255)

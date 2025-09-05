@@ -1,10 +1,10 @@
 {% extends 'mqa/base.html' %}
 {% load crispy_forms_filters %}
-{% block title %}Login{% endblock %}
+{% block title %}Логин{% endblock %}
 {% block content %}
     <form method="post">
         {% csrf_token %}{{ form|crispy }}
-        <button type="submit" class="btn btn-success">Login</button>
-        <a href="/sign-up">Click here to register</a>
+        <button type="submit" class="btn btn-success">Войти</button>
+        <a href="/sign-up">Регистрация</a>
     </form>
 {% endblock %}
