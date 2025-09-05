@@ -69,6 +69,17 @@ class QuoteForm(forms.ModelForm):
             raise forms.ValidationError('Вес должен быть не меньше 1.')
         return weight
 
+    def clean_quote_content(self):
+        quote_content = self.cleaned_data.get('quote_content')
+        if quote_content:
+            # Check for duplicates
+            existing = Quote.objects.filter(quote_content=quote_content)
+            if self.instance.pk:
+                existing = existing.exclude(pk=self.instance.pk)
+            if existing.exists():
+                raise forms.ValidationError('Цитата с таким текстом уже существует.')
+        return quote_content
+
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
